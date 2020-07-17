@@ -3,6 +3,7 @@ using namespace std;
 
 const int MaxRooms=581;
 bool RoomOccupied[MaxRooms];
+int guestCount=0;
 
 struct Guest
 {
@@ -23,42 +24,84 @@ void swap(Guest* a, Guest* b)
     *b = t;  
 }  
   
-int partition (Guest arr[], int low, int high)  
+int partition (Guest arr[], int low, int high,int property)  
 {  
-    int pivot = arr[high].RoomNo;  
+     int pivotInt = arr[high].RoomNo; 
+     string pivotStr=arr[high].name; 
     int i = (low - 1); 
   
     for (int j = low; j <= high - 1; j++)  
     {  
-          
-        if (arr[j].RoomNo < pivot)  
-        {  
-            i++;  
-            swap(&arr[i], &arr[j]);  
+        if(property==0)
+        {
+            if (arr[j].RoomNo < pivotInt)  
+            {  
+                i++;  
+                swap(&arr[i], &arr[j]);  
+            }  
         }  
+        else if(property==1)
+        {
+            if(property==0)
+        {
+            if (arr[j].name < pivotStr)  
+            {  
+                i++;  
+                swap(&arr[i], &arr[j]);  
+            }  
+        } 
+        }
     }  
     swap(&arr[i + 1], &arr[high]);  
     return (i + 1);  
 }  
   
 
-void quickSort(Guest arr[], int low, int high)  
+void quickSort(Guest arr[], int low, int high,int property)  
 {  
     if (low < high)  
     {  
-        int pi = partition(arr, low, high);  
-        quickSort(arr, low, pi - 1);  
-        quickSort(arr, pi + 1, high);  
+        int pi = partition(arr, low, high,property);  
+        quickSort(arr, low, pi - 1,property);  
+        quickSort(arr, pi + 1, high,property);  
     }  
 }  
 
+int binarySearch(Guest arr[], string x,int n) 
+    { 
+        int l = 0 ; 
+        int r = n - 1; 
+        while (l <= r)  
+        { 
+            int m = l + (r - l) / 2; 
+  
+        int res; 
+        if (x == (arr[m].name)) 
+            res = 0; 
+
+            if (res == 0) 
+                return m;
+
+            if (x > (arr[m].name)) 
+                l = m + 1; 
+
+            else
+                r = m - 1; 
+        } 
+  
+        return -1; 
+    }
 
 
 void filter(int date)
 {
     while(!Guests.empty())
     {
-        if(Guests.front().endDate<date) Guests.pop();
+        if(Guests.front().endDate<date) 
+        {
+            RoomOccupied[Guests.front().RoomNo]=false;
+            Guests.pop();
+        }
         else break;
     }
 }
@@ -87,8 +130,18 @@ void checkIn()
      cout<<"Enter guest age"<<endl;
      cin>>age;
     cout<<"Please choose a room from the following list of unoccupied rooms"<<endl;
-    EmptyRooms();
-    cin>>RoomNo;
+
+        int count=0;
+        for(int i=81;i<581 && count<10; i++)
+        {
+            if(!RoomOccupied[i])
+            {
+                cout<<i<<" ";
+                count+=1;
+            }
+        }
+        cout<<endl;
+       cin>>RoomNo;
 
     newGuest.name=name;
     newGuest.startDate=startDate;
@@ -100,8 +153,9 @@ void checkIn()
     RoomOccupied[RoomNo]=true;
     
     Guests.push(newGuest);
-    cout<<"The guest"<<name<<"was succesfully checked in"<<endl;
+    cout<<"The guest "<<name<<" was succesfully checked in"<<endl;
 
+    guestCount+=1;
 }
 
 void sortGuests()
@@ -114,24 +168,78 @@ void sortGuests()
         Guests.pop();
     }
     
-    quickSort(GuestsArray,0,n-1);
+    quickSort(GuestsArray,0,n-1,0);
     
     cout<<"The sorted list of room nos with the persons occupying them is "<<endl;
-
+     
     for (int i = 0; i < n; i++)
     {
         cout<<GuestsArray[i].RoomNo<<" "<<GuestsArray[i].name<<endl;
     }
     
-
-    
-
+    for (int i = 0; i < n; i++)
+    {
+        Guests.push(GuestsArray[i]);
+    }
     
 }
 
+void searchGuest()
+{
+    int n=Guests.size();
+    Guest GuestsArray[n];
+    for (int i = 0; i < n; i++)
+    {
+        GuestsArray[i]=Guests.front();
+        Guests.pop();
+    }
 
+    quickSort(GuestsArray,0,n-1,1);
+    string name;
+    cout<<"Enter the name of the person you want to search "<<endl;
+    cin>>name;
+    int result=binarySearch(GuestsArray,name,n);
+    if(result==-1)
+    {
+        cout<<"No such person exists in the system "<<endl;
+    }
+    else
+    {
+        cout<<"Name : "<<name<<" ";
+        cout<<"Room no : "<<GuestsArray[result].RoomNo<<endl;
+    }
+    
+    for (int i = 0; i < n; i++)
+    {
+        Guests.push(GuestsArray[i]);
+    }
+    
+
+}
+
+void displayRooms()
+{
+    cout<<"Currently "<<guestCount<<" rooms are occupied and "<<500-guestCount<<" rooms are availabele "<<endl;
+    cout<<"The occupied rooms are "<<endl;
+    for (int i = 81; i < 581; i++)
+    {
+        if(RoomOccupied[i]) cout<<i<<" ";
+    }
+
+    cout<<"The unoccupied rooms are "<<endl;
+
+    for (int i = 81; i < 581; i++)
+    {
+        if(!RoomOccupied[i]) cout<<i<<" ";
+
+        if(i%20==0) cout<<endl;
+    }
+    
+    
+}
 void Display()
 {   
+    bool end=false;
     int today;
     cout<<"Enter todays date --> ";
     cin>>today;
@@ -146,7 +254,8 @@ void Display()
     cin>>choice;
     if(choice==1)
     {
-        checkIn();
+        if(guestCount<500) checkIn();
+        else cout<<"There are no more empty rooms"<<endl;
     }
     else if(choice==2)
     {
@@ -154,23 +263,30 @@ void Display()
     }
     else if(choice==3)
     {
-
+         searchGuest();
     }
     else if(choice==4)
     {
-        
-    
+        displayRooms();
     }
     else if(choice==5)
     {
+        cout<<"Are you sure you want to exit? (y/n)"<<endl;
+        char confirmation;
+        cin>>confirmation;
+        if(confirmation=='y')
+        {
+            cout<<"Thank you for using the portal "<<endl;
+            end=true;
 
+        }
     }
     else
     {
         cout<<"INVALID INPUT"<<endl;
     }
     
-    Display();
+   if(!end) Display();
     
 }
 
