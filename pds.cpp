@@ -19,6 +19,7 @@ struct Guest
     int endDate;
     int endMonth;
     string address;
+    string goingTo;
     int age;
     int RoomNo;
 };
@@ -74,30 +75,30 @@ void quickSort(Guest arr[], int low, int high, int choice)
 
 int binarySearch(Guest arr[], int n, int roomNo, string x, int choice,bool searchFirst)
 {
-    int l = 0;
-    int r = n - 1;
+    int left = 0;
+    int right = n - 1;
     int result=-1;
-    while (l <= r)
+    while (left <= right)
     {
-        int m = l + (r - l) / 2;
+        int mid= left + (right - left) / 2;
 
-        int compare = x.compare(arr[m].name);
+        int compare = x.compare(arr[mid].name);
 
-        if ((compare == 0 && choice == 0) || (roomNo == arr[m].RoomNo && choice == 1))
+        if ((compare == 0 && choice == 0) || (roomNo == arr[mid].RoomNo && choice == 1))
             {
-                result=m;
+                result=mid;
 
                 if(searchFirst)
-                    r=m-1;
+                    right=mid-1;
                 else
-                    l=m+1;
+                    left=mid+1;
             }
 
-        else if ((compare > 0 && choice == 0) || (roomNo > arr[m].RoomNo && choice == 1))
-            l = m + 1;
+        else if ((compare > 0 && choice == 0) || (roomNo > arr[mid].RoomNo && choice == 1))
+            left = mid + 1;
 
         else
-            r = m - 1;
+            right = mid - 1;
     }
 
     return result;
@@ -140,6 +141,7 @@ void checkIn()
     int endDate;
     int endMonth;
     string address;
+    string goingTo;
     int age;
     int RoomNo;
 
@@ -175,6 +177,9 @@ void checkIn()
     cout << "Enter Guest Address -> ";
     getline(cin >> ws, address);
 
+    cout <<"Enter where Guest is going to -> ";
+    getline(cin>>ws, goingTo);
+
     cout << "Enter guest age -> ";
     cin >> age;
 
@@ -207,6 +212,7 @@ void checkIn()
     newGuest.endDate = endDate;
     newGuest.endMonth = endMonth;
     newGuest.address = address;
+    newGuest.goingTo = goingTo;
     newGuest.age = age;
     newGuest.RoomNo = RoomNo;
 
@@ -226,9 +232,11 @@ void sortGuests()
 {
     int n = Guests.size();
     Guest GuestsArray[n];
+    Guest GuestsArray2[n];
     for (int i = 0; i < n; i++)
     {
         GuestsArray[i] = Guests.front();
+        GuestsArray2[i]=Guests.front();
         Guests.pop();
     }
 
@@ -241,7 +249,7 @@ void sortGuests()
     cin >> choice;
     quickSort(GuestsArray, 0, n - 1, choice);
     cout << endl;
-     bool showname = true, showDates = true, showAddress = true, showRoomNo = true, showAge = true;
+     bool showName = true, showDates = true, showAddress = true, showRoomNo = true, showAge = true;
 
     char info;
     
@@ -257,7 +265,7 @@ void sortGuests()
         cout << "name -> ";
         cin >> info;
         if (info == 'n')
-            showname = false;
+            showName = false;
 
         cout << "Room No -> ";
         cin >> info;
@@ -269,7 +277,7 @@ void sortGuests()
         if (info == 'n')
             showDates = false;
 
-        cout << "Address -> ";
+        cout << "Address and Going To -> ";
         cin >> info;
         if (info == 'n')
             showAddress = false;
@@ -284,19 +292,22 @@ void sortGuests()
     cout << endl;
     for (int i = 0; i < n; i++)
     {
-        if (showname)
-            cout << "name: " << GuestsArray[i].name << endl;
+        if (showName)
+            cout << "Name:      " << GuestsArray[i].name << endl;
         if (showRoomNo)
-            cout << "Room No: " << GuestsArray[i].RoomNo << endl;
+            cout << "Room No:   " << GuestsArray[i].RoomNo << endl;
         if (showDates)
         {
-            cout << "Check in: " << GuestsArray[i].startDate << " / " << GuestsArray[i].startMonth << endl;
-            cout << "Check Out:  " << GuestsArray[i].endDate << " / " << GuestsArray[i].endMonth << endl;
+            cout << "Check in:  " << GuestsArray[i].startDate << "/" << GuestsArray[i].startMonth << endl;
+            cout << "Check Out: " << GuestsArray[i].endDate << "/" << GuestsArray[i].endMonth << endl;
         }
         if (showAddress)
+        {
             cout << "Address: " << GuestsArray[i].address << endl;
+            cout << "Going TO:  "<< GuestsArray[i].goingTo <<endl;
+        }
         if (showAge)
-            cout << "Age: " << GuestsArray[i].age << endl;
+            cout << "Age:       " << GuestsArray[i].age << endl;
         cout << endl;
     }
     cout << "##########################################################" << endl;
@@ -304,7 +315,7 @@ void sortGuests()
 
     for (int i = 0; i < n; i++)
     {
-        Guests.push(GuestsArray[i]);
+        Guests.push(GuestsArray2[i]);
     }
 }
 
@@ -312,9 +323,11 @@ void searchGuest()
 {
     int n = Guests.size();
     Guest GuestsArray[n];
+    Guest GuestsArray2[n];
     for (int i = 0; i < n; i++)
     {
         GuestsArray[i] = Guests.front();
+        GuestsArray2[i]= Guests.front();
         Guests.pop();
     }
 
@@ -347,12 +360,13 @@ void searchGuest()
             for(int i=firstIndex;i<=lastIndex;i++)
             {
 
-                cout << "Name : " << GuestsArray[i].name << endl;
-                cout << "Room no : " << GuestsArray[i].RoomNo << endl;
-                cout << "Check in date : " << GuestsArray[i].startDate << "/" << GuestsArray[i].startMonth << endl;
-                cout << "Release date : " << GuestsArray[i].endDate << "/" << GuestsArray[i].endMonth << endl;
-                cout << "Address : " << GuestsArray[i].address << endl;
-                cout << "Age : " << GuestsArray[i].age << endl;
+                cout << "Name           :" << GuestsArray[i].name << endl;
+                cout << "Room no        :" << GuestsArray[i].RoomNo << endl;
+                cout << "Check in date  :" << GuestsArray[i].startDate << "/" << GuestsArray[i].startMonth << endl;
+                cout << "Release date   :" << GuestsArray[i].endDate << "/" << GuestsArray[i].endMonth << endl;
+                cout << "Address        :" << GuestsArray[i].address << endl;
+                cout << "Going to       :"<< GuestsArray[i].goingTo <<endl;
+                cout << "Age            :" << GuestsArray[i].age << endl;
                 cout<<endl;
             }
         }
@@ -372,12 +386,13 @@ void searchGuest()
         {
             cout << "Your requested details are -> " << endl;
             cout << endl;
-            cout << "Name : " << GuestsArray[result].name << endl;
-            cout << "Room no : " << GuestsArray[result].RoomNo << endl;
+            cout << "Name          : " << GuestsArray[result].name << endl;
+            cout << "Room no       : " << GuestsArray[result].RoomNo << endl;
             cout << "Check in date : " << GuestsArray[result].startDate << "/" << GuestsArray[result].startMonth << endl;
-            cout << "Release date : " << GuestsArray[result].endDate << "/" << GuestsArray[result].endMonth << endl;
-            cout << "Address : " << GuestsArray[result].address << endl;
-            cout << "Age : " << GuestsArray[result].age << endl;
+            cout << "Release date  : " << GuestsArray[result].endDate << "/" << GuestsArray[result].endMonth << endl;
+            cout << "Address       : " << GuestsArray[result].address << endl;
+            cout << "Going to      : "<<GuestsArray[result].goingTo<<endl; 
+            cout << "Age           : " << GuestsArray[result].age << endl;
         }
     }
     cout << endl;
@@ -385,7 +400,7 @@ void searchGuest()
     cout << endl;
     for (int i = 0; i < n; i++)
     {
-        Guests.push(GuestsArray[i]);
+        Guests.push(GuestsArray2[i]);
     }
 }
 
@@ -431,12 +446,13 @@ void displayAll()
     for(int i=0;i<n;i++)
             {
 
-                cout << "Name : " << GuestsArray[i].name << endl;
-                cout << "Room no : " << GuestsArray[i].RoomNo << endl;
+                cout << "Name          : " << GuestsArray[i].name << endl;
+                cout << "Room no       : " << GuestsArray[i].RoomNo << endl;
                 cout << "Check in date : " << GuestsArray[i].startDate << "/" << GuestsArray[i].startMonth << endl;
-                cout << "Release date : " << GuestsArray[i].endDate << "/" << GuestsArray[i].endMonth << endl;
-                cout << "Address : " << GuestsArray[i].address << endl;
-                cout << "Age : " << GuestsArray[i].age << endl;
+                cout << "Release date  : " << GuestsArray[i].endDate << "/" << GuestsArray[i].endMonth << endl;
+                cout << "Address       : " << GuestsArray[i].address << endl;
+                cout << "Going to      : "<< GuestsArray[i].goingTo<<endl;
+                cout << "Age           : " << GuestsArray[i].age << endl;
                 cout<<endl;
             }
     
@@ -551,8 +567,11 @@ int main()
         
         if (vername == username && userpass == password)
         {
-            cout<<"Login Succesfull"<<endl;
+            cout<<"Login Succesfull !!"<<endl;
             cout<<endl;
+            cout << "###########################################################" << endl;
+            cout << endl;
+
             InitializeRooms();    
 
             Display();
@@ -564,10 +583,10 @@ int main()
             {   cout<<endl;
                 cout<<"The username/password you entered was incorrect. Enter again "<<endl;
                 cout<<endl;
-                cout << "Enter username:";
-                 cin >> vername;
+                cout << "Enter username: ";
+                cin >> vername;
                 cout << endl;
-                cout << "Enter password:";
+                cout << "Enter password: ";
                 cin>>userpass;
                 cout<<endl;
             } while (vername != username || userpass != password);
