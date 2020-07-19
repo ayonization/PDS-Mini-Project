@@ -72,31 +72,35 @@ void quickSort(Guest arr[], int low, int high, int choice)
     }
 }
 
-int binarySearch(Guest arr[], int n, int roomNo, string x, int choice)
+int binarySearch(Guest arr[], int n, int roomNo, string x, int choice,bool searchFirst)
 {
     int l = 0;
     int r = n - 1;
+    int result=-1;
     while (l <= r)
     {
         int m = l + (r - l) / 2;
 
-        int res;
         int compare = x.compare(arr[m].name);
 
         if ((compare == 0 && choice == 0) || (roomNo == arr[m].RoomNo && choice == 1))
-            res = 0;
+            {
+                result=m;
 
-        if (res == 0)
-            return m;
+                if(searchFirst)
+                    r=m-1;
+                else
+                    l=m+1;
+            }
 
-        if ((compare > 0 && choice == 0) || (roomNo > arr[m].RoomNo && choice == 1))
+        else if ((compare > 0 && choice == 0) || (roomNo > arr[m].RoomNo && choice == 1))
             l = m + 1;
 
         else
             r = m - 1;
     }
 
-    return -1;
+    return result;
 }
 
 void InitializeRooms()
@@ -228,6 +232,7 @@ void sortGuests()
         Guests.pop();
     }
 
+
     int choice;
     cout << "Enter 0 if you want to sort on the basis of name" << endl;
     cout << "Enter 1 if you want to sort on the basis of Room No" << endl;
@@ -236,12 +241,15 @@ void sortGuests()
     cin >> choice;
     quickSort(GuestsArray, 0, n - 1, choice);
     cout << endl;
+     bool showname = true, showDates = true, showAddress = true, showRoomNo = true, showAge = true;
 
     char info;
-    bool showname = true, showDates = true, showAddress = true, showRoomNo = true, showAge = true;
+    
     cout << "Would you like to see all information about the guests? (y/n) -> ";
     cin >> info;
     cout << endl;
+
+    
     if (info == 'n')
     {
         cout << "Enter the information youd like to display(y/n) " << endl;
@@ -313,6 +321,7 @@ void searchGuest()
     int result;
     cout << "Enter 0 if you want to search on the basis of name " << endl;
     cout << "Enter 1 if you want to search on the basis of Room No " << endl;
+    cout<<endl;
     int choice;
     cout << "Enter your choice here -> ";
     cin >> choice;
@@ -324,21 +333,28 @@ void searchGuest()
         cout << "Enter the name you want to search-> ";
         getline(cin >> ws, name);
         cout << endl;
-        result = binarySearch(GuestsArray, n, 0, name, choice);
+        result = binarySearch(GuestsArray, n, 0, name, choice,true);
         if (result == -1)
         {
             cout << "No such person exists in the system " << endl;
         }
         else
-        {
-            cout << "Your requested details are -> " << endl;
-            cout << endl;
-            cout << "Name : " << GuestsArray[result].name << endl;
-            cout << "Room no : " << GuestsArray[result].RoomNo << endl;
-            cout << "Check in date : " << GuestsArray[result].startDate << "/" << GuestsArray[result].startMonth << endl;
-            cout << "Release date : " << GuestsArray[result].endDate << "/" << GuestsArray[result].endMonth << endl;
-            cout << "Address : " << GuestsArray[result].address << endl;
-            cout << "Age : " << GuestsArray[result].age << endl;
+        {   
+            int firstIndex=result;
+            int lastIndex=binarySearch(GuestsArray, n, 0, name, choice,false);
+            cout<<"There is/are "<<lastIndex-firstIndex+1<<" items that match your search"<<endl;
+            cout<<endl;
+            for(int i=firstIndex;i<=lastIndex;i++)
+            {
+
+                cout << "Name : " << GuestsArray[i].name << endl;
+                cout << "Room no : " << GuestsArray[i].RoomNo << endl;
+                cout << "Check in date : " << GuestsArray[i].startDate << "/" << GuestsArray[i].startMonth << endl;
+                cout << "Release date : " << GuestsArray[i].endDate << "/" << GuestsArray[i].endMonth << endl;
+                cout << "Address : " << GuestsArray[i].address << endl;
+                cout << "Age : " << GuestsArray[i].age << endl;
+                cout<<endl;
+            }
         }
     }
     else if (choice == 1)
@@ -347,7 +363,7 @@ void searchGuest()
         cout << "Enter the Room no you want to search -> ";
         cin >> roomNo;
         cout << endl;
-        result = binarySearch(GuestsArray, n, roomNo, "", choice);
+        result = binarySearch(GuestsArray, n, roomNo, "", choice,true);
         if (result == -1)
         {
             cout << "This Room has not been alloted to anyone " << endl;
@@ -399,20 +415,42 @@ void displayRooms()
     cout << "##########################################################" << endl;
     cout << endl;
 }
+
+void displayAll()
+{
+    
+    int n = Guests.size();
+    Guest GuestsArray[n];
+    for (int i = 0; i < n; i++)
+    {
+        GuestsArray[i] = Guests.front();
+        Guests.pop();
+    }
+    cout<<"Here are the details of all the Guests in the facility : "<<endl;
+    cout<<endl;
+    for(int i=0;i<n;i++)
+            {
+
+                cout << "Name : " << GuestsArray[i].name << endl;
+                cout << "Room no : " << GuestsArray[i].RoomNo << endl;
+                cout << "Check in date : " << GuestsArray[i].startDate << "/" << GuestsArray[i].startMonth << endl;
+                cout << "Release date : " << GuestsArray[i].endDate << "/" << GuestsArray[i].endMonth << endl;
+                cout << "Address : " << GuestsArray[i].address << endl;
+                cout << "Age : " << GuestsArray[i].age << endl;
+                cout<<endl;
+            }
+    
+    for (int i = 0; i < n; i++)
+    {
+        Guests.push(GuestsArray[i]);
+    }
+
+}
 void Display()
 {
     bool end = false;
     int day;
     int month;
-    int password;
-    int userpass;
-    password = 12345678;
-    string username;
-    string ramesh;
-    username = ramesh;
-    string vername;
-    
-
     cout << "Enter today's date (dd mm) --> ";
     cin >> day >> month;
     if (day > 31 || day < 1 || month > 12 || month < 1)
@@ -433,7 +471,8 @@ void Display()
     cout << "2. Sort The Guest List" << endl;
     cout << "3. Search for a guest" << endl;
     cout << "4. Display vacant and Occupied rooms" << endl;
-    cout << "5. Exit the portal" << endl;
+    cout << "5. Display information about all guests in the facility "<<endl;
+    cout << "6. Exit the portal" << endl;
     cout << endl;
     cout << "Enter your choice here --> ";
     int choice;
@@ -452,16 +491,7 @@ void Display()
     }
     else if (choice == 3)
     {
-        cout << "Enter username:";
-        cin >> vername;
-        cout << endl;
-        cout << "Enter password:";
-        cin >> userpass;
-        cout << endl;
-        if (vername == username && userpass == password)
-        {
-            searchGuest();
-        }
+        searchGuest();
     }
     else if (choice == 4)
     {
@@ -469,12 +499,18 @@ void Display()
     }
     else if (choice == 5)
     {
+        displayAll();
+    }
+    else if (choice == 6)
+    {
         cout << "Are you sure you want to exit? (y/n)" << endl;
         char confirmation;
         cin >> confirmation;
         if (confirmation == 'y')
         {
             cout << "Thank you for using the portal " << endl;
+            cout<<endl;
+            cout << "###########################################################" << endl;
             end = true;
         }
     }
@@ -491,11 +527,52 @@ int main()
 {
     cout << "###########################################################" << endl;
     cout << endl;
-    cout << "WELCOME TO THE NIT SILCHAR QUARANTINE FACILITY PORTAL" << endl;
+    cout << "WELCOME TO THE NIT SILCHAR QUARRENTINE FACILITY PORTAL" << endl;
     cout << endl;
     cout << "###########################################################" << endl;
     cout << endl;
 
-    InitializeRooms();    
-    Display();
+    int password;
+    password = 12345;
+    int userpass;
+    string username;
+    username = "nits";
+    string vername;
+    
+    cout<<endl;
+    cout<<"Enter the username and password to login"<<endl;
+    cout<<endl;
+    cout << "Enter username:";
+        cin >> vername;
+        cout << endl;
+        cout << "Enter password:";
+        cin >> userpass;
+        cout << endl;
+        
+        if (vername == username && userpass == password)
+        {
+            cout<<"Login Succesfull"<<endl;
+            cout<<endl;
+            InitializeRooms();    
+
+            Display();
+        }
+
+        else
+        {
+            do
+            {   cout<<endl;
+                cout<<"The username/password you entered was incorrect. Enter again "<<endl;
+                cout<<endl;
+                cout << "Enter username:";
+                 cin >> vername;
+                cout << endl;
+                cout << "Enter password:";
+                cin>>userpass;
+                cout<<endl;
+            } while (vername != username || userpass != password);
+            
+        }
+
+    
 }
