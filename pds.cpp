@@ -4,10 +4,10 @@
 
 using namespace std;
 
-const int FirstRoom=81;
-const int LastRoom = 581;
+const int firstRoom=81;
+const int lastRoom = 580;
 
-bool RoomOccupied[LastRoom];
+bool roomOccupied[lastRoom+1];
 int guestCount = 0;
 char Continue;
 
@@ -21,7 +21,7 @@ struct Guest
     string address;
     string goingTo;
     int age;
-    int RoomNo;
+    int roomNo;
 };
 
 queue<Guest> Guests;
@@ -35,7 +35,7 @@ void swap(Guest *a, Guest *b)
 
 int partition(Guest arr[], int low, int high, int choice)
 {
-    int pivotInt = arr[high].RoomNo;
+    int pivotInt = arr[high].roomNo;
     string pivotStr = arr[high].name;
     int i = (low - 1);
 
@@ -43,7 +43,7 @@ int partition(Guest arr[], int low, int high, int choice)
     {
         if (choice == 1)
         {
-            if (arr[j].RoomNo < pivotInt)
+            if (arr[j].roomNo < pivotInt)
             {
                 i++;
                 swap(&arr[i], &arr[j]);
@@ -84,7 +84,7 @@ int binarySearch(Guest arr[], int n, int roomNo, string x, int choice,bool searc
 
         int compare = x.compare(arr[mid].name);
 
-        if ((compare == 0 && choice == 0) || (roomNo == arr[mid].RoomNo && choice == 1))
+        if ((compare == 0 && choice == 0) || (roomNo == arr[mid].roomNo && choice == 1))
             {
                 result=mid;
 
@@ -94,7 +94,7 @@ int binarySearch(Guest arr[], int n, int roomNo, string x, int choice,bool searc
                     left=mid+1;
             }
 
-        else if ((compare > 0 && choice == 0) || (roomNo > arr[mid].RoomNo && choice == 1))
+        else if ((compare > 0 && choice == 0) || (roomNo > arr[mid].roomNo && choice == 1))
             left = mid + 1;
 
         else
@@ -104,11 +104,11 @@ int binarySearch(Guest arr[], int n, int roomNo, string x, int choice,bool searc
     return result;
 }
 
-void InitializeRooms()
+void initializeRooms()
 {
-    for (int i = FirstRoom; i < LastRoom; i++)
+    for (int i = firstRoom; i <= lastRoom; i++)
     {
-        RoomOccupied[i] = false;
+        roomOccupied[i] = false;
     }
 }
 
@@ -123,7 +123,7 @@ void filter(int date, int month)
     {
         if (calcDate(Guests.front().endDate, Guests.front().endMonth) < calcDate(date, month))
         {
-            RoomOccupied[Guests.front().RoomNo] = false;
+            roomOccupied[Guests.front().roomNo] = false;
             guestCount -= 1;
             Guests.pop();
         }
@@ -143,7 +143,7 @@ void checkIn()
     string address;
     string goingTo;
     int age;
-    int RoomNo;
+    int roomNo;
 
     cout << "Please enter the following data with regards to the guest details" << endl;
     cout << endl;
@@ -186,9 +186,9 @@ void checkIn()
     cout << "Please choose a room from the following list of unoccupied rooms -> ";
 
     int count = 0;
-    for (int i = FirstRoom; i < LastRoom && count < 10; i++)
+    for (int i = firstRoom; i <= lastRoom && count < 10; i++)
     {
-        if (!RoomOccupied[i])
+        if (!roomOccupied[i])
         {
             cout << i << " ";
             count += 1;
@@ -196,14 +196,14 @@ void checkIn()
     }
     cout << endl;
     cout << "Enter the Room Number --> ";
-    cin >> RoomNo;
-    if (RoomOccupied[RoomNo] || RoomNo < 81 || RoomNo > 580)
+    cin >> roomNo;
+    if (roomOccupied[roomNo] || roomNo < 81 || roomNo > 580)
     {
         do
         {
             cout << "This Room is not available. Please enter a Room Number again ->";
-            cin >> RoomNo;
-        } while (RoomOccupied[RoomNo]);
+            cin >> roomNo;
+        } while (roomOccupied[roomNo]);
     }
 
     newGuest.name = name;
@@ -214,15 +214,15 @@ void checkIn()
     newGuest.address = address;
     newGuest.goingTo = goingTo;
     newGuest.age = age;
-    newGuest.RoomNo = RoomNo;
+    newGuest.roomNo = roomNo;
 
-    RoomOccupied[RoomNo] = true;
+    roomOccupied[roomNo] = true;
 
     Guests.push(newGuest);
     cout << endl;
     cout << "The guest " << name << " was succesfully checked in" << endl;
     cout << endl;
-
+    
     guestCount += 1;
     cout << "##########################################################" << endl;
     cout << endl;
@@ -239,8 +239,8 @@ void sortGuests()
         GuestsArray2[i]=Guests.front();
         Guests.pop();
     }
-
-
+    
+    
     int choice;
     cout << "Enter 0 if you want to sort on the basis of name" << endl;
     cout << "Enter 1 if you want to sort on the basis of Room No" << endl;
@@ -295,7 +295,7 @@ void sortGuests()
         if (showName)
             cout << "Name:      " << GuestsArray[i].name << endl;
         if (showRoomNo)
-            cout << "Room No:   " << GuestsArray[i].RoomNo << endl;
+            cout << "Room No:   " << GuestsArray[i].roomNo << endl;
         if (showDates)
         {
             cout << "Check in:  " << GuestsArray[i].startDate << "/" << GuestsArray[i].startMonth << endl;
@@ -361,7 +361,7 @@ void searchGuest()
             {
 
                 cout << "Name           :" << GuestsArray[i].name << endl;
-                cout << "Room no        :" << GuestsArray[i].RoomNo << endl;
+                cout << "Room no        :" << GuestsArray[i].roomNo << endl;
                 cout << "Check in date  :" << GuestsArray[i].startDate << "/" << GuestsArray[i].startMonth << endl;
                 cout << "Release date   :" << GuestsArray[i].endDate << "/" << GuestsArray[i].endMonth << endl;
                 cout << "Address        :" << GuestsArray[i].address << endl;
@@ -387,7 +387,7 @@ void searchGuest()
             cout << "Your requested details are -> " << endl;
             cout << endl;
             cout << "Name          : " << GuestsArray[result].name << endl;
-            cout << "Room no       : " << GuestsArray[result].RoomNo << endl;
+            cout << "Room no       : " << GuestsArray[result].roomNo << endl;
             cout << "Check in date : " << GuestsArray[result].startDate << "/" << GuestsArray[result].startMonth << endl;
             cout << "Release date  : " << GuestsArray[result].endDate << "/" << GuestsArray[result].endMonth << endl;
             cout << "Address       : " << GuestsArray[result].address << endl;
@@ -409,18 +409,18 @@ void displayRooms()
     cout << "Currently " << guestCount << " rooms are occupied and " << 500 - guestCount << " rooms are availabele " << endl;
     cout << endl;
     cout << "The occupied rooms are " << endl;
-    for (int i = FirstRoom; i < LastRoom; i++)
+    for (int i = firstRoom; i <= lastRoom; i++)
     {
-        if (RoomOccupied[i])
+        if (roomOccupied[i])
             cout << i << " ";
     }
     cout << endl;
 
     cout << "The unoccupied rooms are " << endl;
 
-    for (int i = FirstRoom; i < LastRoom; i++)
+    for (int i = firstRoom; i <= lastRoom; i++)
     {
-        if (!RoomOccupied[i])
+        if (!roomOccupied[i])
             cout << i << " ";
 
         if (i % 20 == 0)
@@ -447,7 +447,7 @@ void displayAll()
             {
 
                 cout << "Name          : " << GuestsArray[i].name << endl;
-                cout << "Room no       : " << GuestsArray[i].RoomNo << endl;
+                cout << "Room no       : " << GuestsArray[i].roomNo << endl;
                 cout << "Check in date : " << GuestsArray[i].startDate << "/" << GuestsArray[i].startMonth << endl;
                 cout << "Release date  : " << GuestsArray[i].endDate << "/" << GuestsArray[i].endMonth << endl;
                 cout << "Address       : " << GuestsArray[i].address << endl;
@@ -462,7 +462,7 @@ void displayAll()
     }
 
 }
-void Display()
+void display()
 {
     bool end = false;
     int day;
@@ -536,7 +536,7 @@ void Display()
     }
 
     if (!end)
-        Display();
+        display();
 }
 
 int main()
@@ -572,9 +572,9 @@ int main()
             cout << "###########################################################" << endl;
             cout << endl;
 
-            InitializeRooms();    
+            initializeRooms();    
 
-            Display();
+            display();
         }
 
         else
@@ -590,7 +590,15 @@ int main()
                 cin>>userpass;
                 cout<<endl;
             } while (vername != username || userpass != password);
-            
+             
+            cout<<"Login Succesfull !!"<<endl;
+            cout<<endl;
+            cout << "###########################################################" << endl;
+            cout << endl;
+
+            initializeRooms();    
+
+            display();
         }
 
     
